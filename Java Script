@@ -1,0 +1,122 @@
+// script.js
+
+// Array of questions, options, and the correct answer index
+const quizData = [
+    {
+        question: "What is the capital of France?",
+        options: ["Berlin", "Madrid", "Paris", "Rome"],
+        answer: 2
+    },
+    {
+        question: "What is 2 + 2?",
+        options: ["3", "4", "5", "6"],
+        answer: 1
+    },
+    {
+        question: "Which language is used for web development?",
+        options: ["Python", "JavaScript", "C#", "Java"],
+        answer: 1
+    },
+    {
+        question: "What is the largest planet in our Solar System?",
+        options: ["Earth", "Jupiter", "Mars", "Saturn"],
+        answer: 1
+    }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let selectedAnswers = new Array(quizData.length).fill(null);
+
+// Initialize quiz
+function startQuiz() {
+    updateScoreDisplay();
+    showQuestion();
+}
+
+// Display the current question and options
+function showQuestion() {
+    const questionData = quizData[currentQuestion];
+    document.getElementById("question").innerText = questionData.question;
+    const answerOptions = document.getElementById("answer-options");
+    answerOptions.innerHTML = ""; // Clear previous options
+
+    questionData.options.forEach((option, index) => {
+        const li = document.createElement("li");
+        li.innerText = option;
+        li.onclick = () => selectAnswer(index, li);
+        answerOptions.appendChild(li);
+        
+        // Restore previous selection coloring
+        if (selectedAnswers[currentQuestion] !== null) {
+            li.classList.add(selectedAnswers[currentQuestion] === questionData.answer ? "correct" : "incorrect");
+        }
+    });
+}
+
+// Handle answer selection
+function selectAnswer(selectedIndex, li) {
+    const questionData = quizData[currentQuestion];
+    const answerOptions = document.getElementById("answer-options").children;
+
+    // Store the selected answer for the current question
+    selectedAnswers[currentQuestion] = selectedIndex;
+
+    // Check if the answer is correct
+    if (selectedIndex === questionData.answer) {
+        score++;
+        li.classList.add("correct");
+    } else {
+        li.classList.add("incorrect");
+    }
+
+    // Disable options after selecting an answer
+    for (let option of answerOptions) {
+        option.onclick = null;
+    }
+    
+    updateScoreDisplay();
+}
+
+// Update the score display
+function updateScoreDisplay() {
+    document.getElementById("score-display").innerText = `Score: ${score}`;
+}
+
+// Move to the next question
+function nextQuestion() {
+    if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        showQuestion();
+    } else {
+        showResult();
+    }
+}
+
+// Move to the previous question
+function prevQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+    }
+}
+
+// Show the quiz result
+function showResult() {
+    document.getElementById("quiz").classList.add("hidden");
+    document.getElementById("result-container").classList.remove("hidden");
+    document.getElementById("score").innerText = `Your total score is: ${score} out of ${quizData.length}`;
+}
+
+// Restart the quiz
+function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    selectedAnswers.fill(null);
+    document.getElementById("result-container").classList.add("hidden");
+    document.getElementById("quiz").classList.remove("hidden");
+    startQuiz();
+}
+
+// Start the quiz on page load
+startQuiz();
